@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css">
+    <style>
+        body {background-color: aliceblue;}
+        h1 {color: lightseagreen; 
+            font-family: Georgia, 'Times New Roman', Times, serif; 
+            font-size: 30px;
+        }
+        p {background-color:peachpuff;
+           color:black; 
+           font-family: Georgia, 'Times New Roman', Times, serif; 
+           font-size: 25px;
+           border-top-style: dotted;
+           border-right-style: solid;
+           border-bottom-style: dotted;
+           border-left-style: solid;
+        }
+        button {background-color: lightseagreen; 
+                font-family: Georgia, 'Times New Roman', Times, serif; 
+                font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Giphy APIs</h1>
+    <p>Click to search for an animal, and to add a button to the list of animals above the search bar. This will display GIFs of your favorite animals.</p>
+
+    <!-- Buttons to be added -->
+        <button class= "btn btn-primary" id= "animal" data-animal="cat">cat</button>
+        <button class= "btn btn-primary" id= "animal" data-animal="dog">dog</button>
+        <button class= "btn btn-primary" id= "animal" data-animal="bunny">rabbit</button>
+        <button class= "btn btn-primary" id= "animal" data-animal="koala">koala</button>
+
+<!-- Search bar -->
+<div class="wrap">
+    <div class="search">
+        <label for="animalInput"></label>
+        <input id="addGif" type="text" value="submit" placeholder="Add an animal">
+        <button type="submit" class="searchButton">Search</button>
+    </div>
+<div id="gifs-appear-here">
+</div>
+  <img src="https://media.giphy.com/media/4NkqE0peQFAbSU0vhT/giphy.gif" data-still="https://media.giphy.com/media/4NkqE0peQFAbSU0vhT/giphy.gif" data-animate="https://media.giphy.com/media/4NkqE0peQFAbSU0vhT/giphy.gif" data-state="still" class="gif">
+  <img src="https://media.giphy.com/media/we41EsnhQZ1Be/giphy.gif" data-still="https://media.giphy.com/media/we41EsnhQZ1Be/giphy.gif" data-animate="https://media.giphy.com/media/we41EsnhQZ1Be/giphy.gif" data-state="still" class="gif">
+  <img src="https://media.giphy.com/media/UZpw1AwQhPsHK/giphy.gif" data-still="https://media.giphy.com/media/UZpw1AwQhPsHK/giphy.gif" data-animate="https://media.giphy.com/media/UZpw1AwQhPsHK/giphy.gif" data-state="still" class="gif">
+  <img src="https://media.giphy.com/media/PuBtjvmj8Of4Y/giphy.gif" data-still="https://media.giphy.com/media/PuBtjvmj8Of4Y/giphy.gif" data-animate="https://media.giphy.com/media/PuBtjvmj8Of4Y/giphy.gif" data-state="still" class="gif">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script type="text/javascript">
+
+$(".gif").on("click", function() {
+// To pause and play gifs:
+$(document).on('click', pausePlay);
+function pausePlay() {
+    var element = $(this);
+        var state = element.attr('data-state');
+            console.log(state);
+    if (state === 'still') {
+     element.attr('src', $(this).attr('data-animate'));
+     element.attr('data-state', 'animate');
+    } else {
+     element.attr('src', $(this).attr('data-still'));
+     element.attr('data-state', 'still');
+    }
+  }
+});
+
+$("button").on("click", function() {
+
+var animal = $(this).attr("data-animal");
+    console.log(animal);
+var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + animal +"&api_key=15NpkBz7D8tlAIBg0fwYheVd1f4jAMYv";
+    console.log(queryURL);
+
+$.ajax({
+    url: queryURL,
+    method: "GET"
+    }).then(function(response) {
+        var results = response.data;
+        console.log(results);
+        for (var i = 0; i < results.length; i++) {
+            var gifDiv = $("<div class='item'>");
+            var rating = results[i].rating;
+            var animate = results[i].images.fixed_height.url;
+            var still = results[i].images.fixed_height_still.url;
+            $('#gifs-appear-here').append('<img src="'+ still + '" data-still= "'+still+'" data-animate= "'+animate+'" data-state= "still" class="gif">');
+            var p = $('<p>').text('Rating: ' + rating);
+            
+            var animalImage = $("<img>");
+            animalImage.attr("src", results[i].images.fixed_height.url);
+
+            gifDiv.prepend(p);
+            gifDiv.prepend(animalImage);
+
+            $("#gifs-appear-here").prepend(gifDiv);    
+        } 
+ $('#addGif').on('click', function(event) {
+    event.preventDefault();
+    var newGif = $('#animalInput').val().trim();
+    animal.push(newGif);
+    console.log(animal);
+    $('#animalInput').val('');
+    showButtons();
+ });
+    function showButtons() {
+        $('#animal').empty();
+        for (var i = 0; i < animal.length; i++);
+        var x = $('<button class= "btn btn-primary">');
+        x.attr('id', 'animal');
+        x.attr('data-search', animal[i]);
+        x.text(animal[i]);
+        $('#animal').append(x);
+    }
+  })     
+});
+</script>
+</body>
+</html>
